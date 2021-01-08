@@ -12,5 +12,12 @@ export class UploadController {
         body: new Error('image')
       }
     }
+
+    if (!httpRequest.body.userKey) {
+      return {
+        statusCode: 400,
+        body: new Error('userKey')
+      }
+    }
   }
 }
