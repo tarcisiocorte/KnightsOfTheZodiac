@@ -1,4 +1,3 @@
 export interface HttpRequest {
-  statusCode: number
-  body:any
+  body?: any
 }
