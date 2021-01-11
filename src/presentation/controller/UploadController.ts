@@ -22,5 +22,12 @@ export class UploadController {
         body: new Error('userKey')
       }
     }
+
+    if(!httpRequest.body.image.includes('.jpg', '.png')) {
+      return {
+        statusCode: 400,
+        body: new Error('The image has not the correct format')
+      }
+    }
   }
 }
