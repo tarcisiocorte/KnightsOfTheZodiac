@@ -1,5 +1,8 @@
+import {HttpRequest} from '../web/IHttpRequest'
+import {HttpResponse} from '../web/IHttpResponse'
+
 export class UploadController {
-  handle (httpRequest: any): any {
+  handle (httpRequest: HttpRequest): HttpResponse {
     if (!httpRequest.body.companyKey) {
       return {
         statusCode: 400,
