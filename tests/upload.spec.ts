@@ -43,14 +43,32 @@ describe('Upload Controller', () => {
   test('should return 400 if the image is not .JPG or .PNG', () => {
     const sut = new UploadController()
     const httpRequest = {
-      body:{
+      body: {
         companyKey: 'any_company_key',
         userKey: 'any_user',
         image: 'image.bmp'
-      }      
+      }
     }
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new Error('The image has not the correct format'))
+  })
+
+  test('should return 200 if valid data is fully provided', () => {
+    const sut = new UploadController()
+    const httpRequest = {
+      body: {
+        companyKey: 'any_company_key',
+        userKey: 'any_user',
+        image: 'image.jpg'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({
+      companyKey: 'any_company_key',
+      userKey: 'any_user',
+      image: 'image.jpg'
+    })
   })
 })
