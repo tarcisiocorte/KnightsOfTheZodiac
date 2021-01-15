@@ -1,5 +1,5 @@
-import {HttpRequest} from '../web/IHttpRequest'
-import {HttpResponse} from '../web/IHttpResponse'
+import { HttpRequest } from '../web/IHttpRequest'
+import { HttpResponse } from '../web/IHttpResponse'
 
 export class UploadController {
   handle (httpRequest: HttpRequest): HttpResponse {
@@ -23,11 +23,16 @@ export class UploadController {
       }
     }
 
-    if(!httpRequest.body.image.includes('.jpg', '.png')) {
+    if (!httpRequest.body.image.includes('.jpg', '.png')) {
       return {
         statusCode: 400,
         body: new Error('The image has not the correct format')
       }
+    }
+
+    return {
+      statusCode: 200,
+      body: httpRequest.body
     }
   }
 }
