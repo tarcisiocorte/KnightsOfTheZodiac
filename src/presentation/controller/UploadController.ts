@@ -1,5 +1,4 @@
-import { HttpRequest } from '../web/IHttpRequest'
-import { HttpResponse } from '../web/IHttpResponse'
+import { HttpRequest, HttpResponse } from '../web'
 
 export class UploadController {
   handle (httpRequest: HttpRequest): HttpResponse {
