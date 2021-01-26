@@ -1,10 +1,13 @@
 import { AddPhotoData } from '@/domain/usecases/add-photodata'
+import { UploadFile } from '@/domain/usecases/upload-file'
 import { badRequest, HttpRequest, HttpResponse, ok } from '../web'
 
 export class UploadController {
   private readonly addPhotoData: AddPhotoData
-  constructor(addPhotoData: AddPhotoData) {
+  private readonly uploadFile: UploadFile
+  constructor(addPhotoData: AddPhotoData, uploadFile: UploadFile) {
     this.addPhotoData = addPhotoData
+    this.uploadFile = uploadFile
   }
 
   async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -23,6 +26,9 @@ export class UploadController {
     if (!httpRequest.body.image.includes('.jpg', '.png')) {
       return badRequest(new Error('The image has not the correct format'))
     }
+
+    const hashFileName = this.uploadFile.upload(httpRequest.body)
+
     const photoData = await this.addPhotoData.add({ companyKey, userKey, image })
     return ok(photoData)
   }
