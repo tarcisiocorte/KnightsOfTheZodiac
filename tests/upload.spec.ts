@@ -1,6 +1,7 @@
 import { UploadController } from '../src/presentation/controller/UploadController'
 import { PhotoDataModel } from './domain/models/photodatamodel'
 import { AddPhotoData, AddPhotoDataModel } from './domain/usecases/add-photodata'
+import { UploadFile } from './domain/usecases/upload-file'
 
 const makeAddPhotoData = (): AddPhotoData => {
   class AddPhotoDataStub implements AddPhotoData {
@@ -17,6 +18,16 @@ const makeAddPhotoData = (): AddPhotoData => {
   return new AddPhotoDataStub()
 }
 
+const makeUploadFile = (): UploadFile => {
+  class UploadFileStub implements UploadFile {
+    async upload(file: any): Promise<string> {
+      const fakeFileName: string = "valid_hash"
+      return new Promise(resolve => resolve(fakeFileName))
+    }
+  }
+  return new UploadFileStub()
+}
+
 interface CreateSutTypes {
   sut: UploadController
   addPhotoDataStub: AddPhotoData
@@ -24,10 +35,12 @@ interface CreateSutTypes {
 
 const createSut = (): CreateSutTypes => {
   const addPhotoDataStub = makeAddPhotoData()
-  const sut = new UploadController(addPhotoDataStub)
+  const uploadFileStub = makeUploadFile()
+  const sut = new UploadController(addPhotoDataStub, uploadFileStub)
   return {
     sut,
-    addPhotoDataStub
+    addPhotoDataStub,
+    uploadFileStub
   }
 }
 
@@ -72,6 +85,19 @@ describe('Upload Controller', () => {
   })
 
   test('should return 400 if the image is not .JPG or .PNG', async () => {
+    const { sut } = createSut()
+    const httpRequest = {
+      body: {
+        companyKey: 'any_company_key',
+        userKey: 'any_user',
+        image: 'image.bmp'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new Error('The image has not the correct format'))
+  })
+  test('should calls UploadFileToCloud', async () => {
     const { sut } = createSut()
     const httpRequest = {
       body: {
