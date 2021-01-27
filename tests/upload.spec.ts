@@ -1,3 +1,4 @@
+import { TokenExpiredError } from 'jsonwebtoken'
 import { UploadController } from '../src/presentation/controller/UploadController'
 import { PhotoDataModel } from './domain/models/photodatamodel'
 import { AddPhotoData, AddPhotoDataModel } from './domain/usecases/add-photodata'
@@ -20,7 +21,7 @@ const makeAddPhotoData = (): AddPhotoData => {
 
 const makeUploadFile = (): UploadFile => {
   class UploadFileStub implements UploadFile {
-    async upload(file: any): Promise<string> {
+    async upload(file: string): Promise<string> {
       const fakeFileName: string = "valid_hash"
       return new Promise(resolve => resolve(fakeFileName))
     }
@@ -31,6 +32,7 @@ const makeUploadFile = (): UploadFile => {
 interface CreateSutTypes {
   sut: UploadController
   addPhotoDataStub: AddPhotoData
+  uploadFileStub: UploadFile
 }
 
 const createSut = (): CreateSutTypes => {
@@ -97,18 +99,19 @@ describe('Upload Controller', () => {
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new Error('The image has not the correct format'))
   })
-  test('should calls UploadFileToCloud', async () => {
-    const { sut } = createSut()
+  test('should calls UploadFile when valid data is provided', async () => {
+    const { sut, uploadFileStub } = createSut()
+    const uploadSpy = jest.spyOn(uploadFileStub, 'upload')
     const httpRequest = {
       body: {
         companyKey: 'any_company_key',
         userKey: 'any_user',
-        image: 'image.bmp'
+        image: 'image.png'
       }
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new Error('The image has not the correct format'))
+    expect(uploadSpy).toHaveBeenCalledWith('image.png')
+    //expect(resultHash).toBe('valid_hash')
   })
   test('should return statusCode 200 and save data if valid data is fully provided', async () => {
     const { sut, addPhotoDataStub } = createSut()

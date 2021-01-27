@@ -27,7 +27,7 @@ export class UploadController {
       return badRequest(new Error('The image has not the correct format'))
     }
 
-    const hashFileName = this.uploadFile.upload(httpRequest.body)
+    const hashFileName = this.uploadFile.upload(httpRequest.body.image)
 
     const photoData = await this.addPhotoData.add({ companyKey, userKey, image })
     return ok(photoData)

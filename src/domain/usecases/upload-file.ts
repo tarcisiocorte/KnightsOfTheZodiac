@@ -1,3 +1,3 @@
 export interface UploadFile {
-    upload(file: any): Promise<string>
+    upload(file: string): Promise<string>
 }
