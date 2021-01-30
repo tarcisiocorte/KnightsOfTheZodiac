@@ -7,5 +7,5 @@ export interface AddPhotoDataModel {
 }
 
 export interface AddPhotoData {
-  add (photoData: AddPhotoDataModel): Promise<PhotoDataModel>
+  add: (photoData: AddPhotoDataModel) => Promise<PhotoDataModel>
 }
