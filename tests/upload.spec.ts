@@ -1,6 +1,7 @@
-import { TokenExpiredError } from 'jsonwebtoken'
 import { UploadController } from '../src/presentation/controller/UploadController'
 import { PhotoDataModel } from './domain/models/photodatamodel'
+import { AddUploadFileModel } from './domain/models/adduploadfilemodel'
+
 import { AddPhotoData, AddPhotoDataModel } from './domain/usecases/add-photodata'
 import { UploadFile } from './domain/usecases/upload-file'
 
@@ -11,7 +12,7 @@ const makeAddPhotoData = (): AddPhotoData => {
         id: 'valid_id',
         companyKey: 'any_company_key',
         userKey: 'an_user_key',
-        image: 'image.png'
+        image: 'image.jpg'
       }
       return new Promise(resolve => resolve(fakePhotoData))
     }
@@ -21,8 +22,8 @@ const makeAddPhotoData = (): AddPhotoData => {
 
 const makeUploadFile = (): UploadFile => {
   class UploadFileStub implements UploadFile {
-    async upload(file: string): Promise<string> {
-      const fakeFileName: string = "valid_hash"
+    async upload(file: AddUploadFileModel): Promise<string> {
+      const fakeFileName = 'image.jpg'
       return new Promise(resolve => resolve(fakeFileName))
     }
   }
@@ -86,7 +87,7 @@ describe('Upload Controller', () => {
     expect(httpResponse.body).toEqual(new Error('userKey'))
   })
 
-  test('should return 400 if the image is not .JPG or .PNG', async () => {
+  test('should return 400 if the image is not .JPG or .jpg', async () => {
     const { sut } = createSut()
     const httpRequest = {
       body: {
@@ -101,17 +102,16 @@ describe('Upload Controller', () => {
   })
   test('should calls UploadFile when valid data is provided', async () => {
     const { sut, uploadFileStub } = createSut()
-    const uploadSpy = jest.spyOn(uploadFileStub, 'upload')
+    const upload = jest.spyOn(uploadFileStub, 'upload')
     const httpRequest = {
       body: {
         companyKey: 'any_company_key',
         userKey: 'any_user',
-        image: 'image.png'
+        image: 'image.jpg'
       }
     }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(uploadSpy).toHaveBeenCalledWith('image.png')
-    //expect(resultHash).toBe('valid_hash')
+    await sut.handle(httpRequest)
+    expect(upload).toHaveBeenCalledWith(expect.anything())
   })
   test('should return statusCode 200 and save data if valid data is fully provided', async () => {
     const { sut, addPhotoDataStub } = createSut()
@@ -130,5 +130,18 @@ describe('Upload Controller', () => {
       userKey: 'any_user',
       image: 'image.jpg'
     })
+  })
+  test('should call UploadFile when valid data is provided', async () => {
+    const { sut, uploadFileStub } = createSut()
+    const upload = jest.spyOn(uploadFileStub, 'upload')
+    const httpRequest = {
+      body: {
+        companyKey: 'any_company_key',
+        userKey: 'any_user',
+        image: 'image.jpg'
+      }
+    }
+    await sut.handle(httpRequest)
+    expect(upload).toHaveBeenCalledWith(expect.anything())
   })
 })
