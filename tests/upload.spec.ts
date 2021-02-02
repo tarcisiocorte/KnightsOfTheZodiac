@@ -144,4 +144,20 @@ describe('Upload Controller', () => {
     await sut.handle(httpRequest)
     expect(upload).toHaveBeenCalledWith(expect.anything())
   })
+  test('Should return 500 if AddPhotoData throws', async () => {
+    const { sut, addPhotoDataStub } = createSut()
+    jest.spyOn(addPhotoDataStub, 'add').mockImplementationOnce(async () => {
+      return new Promise((resolve, reject) => reject(new Error()))
+    })
+    const httpRequest = {
+      body: {
+        companyKey: 'any_company_key',
+        userKey: 'any_user',
+        image: 'image.jpg'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new Error())
+  })
 })
