@@ -10,12 +10,12 @@ export const unauthorized = (): HttpResponse => ({
   statusCode: 401,
   body: new UnauthorizedError()
 })
-
-export const serverError = (error: Error): HttpResponse => ({
-  statusCode: 500,
-  body: new ServerError(error.stack)
-})
 **/
+
+export const serverError = (): HttpResponse => ({
+  statusCode: 500,
+  body: new Error()
+})
 
 export const ok = (data: any): HttpResponse => ({
   statusCode: 200,
